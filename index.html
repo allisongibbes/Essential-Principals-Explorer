@@ -1,0 +1,192 @@
+<style>
+  .essential-widget {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #1a1a1a;
+    border: 2px solid #444;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .principle-btn {
+    padding: 12px 8px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+
+  .principle-btn:hover {
+    background-color: #e3f2fd;
+  }
+
+  .principle-btn.active {
+    background-color: #1976d2;
+    color: white;
+    border-color: #1565c0;
+  }
+
+  .description-box {
+    background: #fff;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    color: #333;
+    min-height: 80px;
+    text-align: left;
+    line-height: 1.4;
+  }
+
+  /* --- ANIMATION STYLES --- */
+
+  /* 1. Staging Animation: Spotlights and camera framing directing focus */
+  .animating-staging {
+    animation: stagingFocus 3s infinite ease-in-out;
+  }
+  @keyframes stagingFocus {
+    0%, 100% { opacity: 0.4; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
+
+  /* 2. Follow Through & Overlapping Action: Body stops, cape/hair drifts past */
+  .animating-followthru {
+    animation: bodyStop 2s infinite ease-in-out;
+    transform-origin: bottom center;
+  }
+  .animating-cape {
+    animation: capeLag 2s infinite ease-in-out;
+    transform-origin: top center;
+  }
+  @keyframes bodyStop {
+    0% { transform: translateX(-80px); }
+    40% { transform: translateX(0px); } /* Body stops abruptly */
+    70% { transform: translateX(0px); }
+    100% { transform: translateX(-80px); }
+  }
+  @keyframes capeLag {
+    0% { transform: translateX(-80px) skewX(0deg); }
+    35% { transform: translateX(-20px) skewX(-25deg); } /* Momentum drags cape forward */
+    50% { transform: translateX(5deg) skewX(10deg); } /* Settles backward */
+    70% { transform: translateX(0px) skewX(0deg); }
+    100% { transform: translateX(-80px) skewX(0deg); }
+  }
+
+  /* 3. Slow In and Slow Out: Smooth acceleration and deceleration */
+  .animating-ease {
+    animation: easeMotion 2.5s infinite cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  @keyframes easeMotion {
+    0% { transform: translateX(-250px); }
+    50% { transform: translateX(250px); } /* Slows down at extremes */
+    100% { transform: translateX(-250px); }
+  }
+</style>
+
+<div class="essential-widget">
+  <h2>The Essential Principles Explorer</h2>
+  <p>Select a principle below to see how animators control focus, inertia, and momentum.</p>
+
+  <div class="stage" id="stageArea">
+    <div id="demoObject"></div>
+  </div>
+
+  <div class="nav-grid">
+    <button class="principle-btn active" onclick="setPrinciple('staging')">1. Staging</button>
+    <button class="principle-btn" onclick="setPrinciple('followthru')">2. Follow Through & Overlap</button>
+    <button class="principle-btn" onclick="setPrinciple('ease')">3. Slow In & Slow Out</button>
+  </div>
+
+  <div class="description-box" id="descBox">
+    <strong>Staging:</strong> The presentation of any idea to make it completely unmistakable. Staging directs the viewer's eye to what matters most using strong silhouettes, framing, and lighting.
+  </div>
+</div>
+
+<script>
+  const demoObject = document.getElementById('demoObject');
+  const descBox = document.getElementById('descBox');
+  const buttons = document.querySelectorAll('.principle-btn');
+
+  const contentData = {
+    staging: {
+      html: `<svg width="400" height="225" viewBox="0 0 400 225">
+               <!-- Background Spotlight -->
+               <polygon points="200,0 80,225 320,225" fill="#333" opacity="0.5"/>
+               <polygon points="200,0 140,225 260,225" fill="#ffeb3b" opacity="0.3" class="animating-staging"/>
+               <!-- Character Silhouette in clear focus -->
+               <circle cx="200" cy="110" r="35" fill="#fff"/>
+               <rect x="185" y="145" width="30" height="60" fill="#fff"/>
+               <path d="M 170 160 L 150 190" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+               <path d="M 230 160 L 250 130" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+               <text x="200" y="215" fill="#aaa" font-size="12" text-anchor="middle">Clear Silhouette & Framing</text>
+             </svg>`,
+      text: "<strong>Staging:</strong> The presentation of any idea to make it completely unmistakable. In animation, staging directs the audience's eye to what is most important in a scene, utilizing character placement, silhouette, and camera framing."
+    },
+    followthru: {
+      html: `<svg width="400" height="225" viewBox="0 0 400 225">
+               <!-- Ground line -->
+               <line x1="50" y1="180" x2="350" y2="180" stroke="#555" stroke-width="3"/>
+               <!-- Cape (Delayed motion) -->
+               <path d="M 190 100 L 150 160 L 210 160 Z" fill="#e91e63" class="animating-cape"/>
+               <!-- Character Body -->
+               <g class="animating-followthru">
+                 <circle cx="200" cy="90" r="30" fill="#03a9f4"/>
+                 <rect x="188" y="120" width="24" height="60" fill="#03a9f4"/>
+               </g>
+               <text x="200" y="210" fill="#aaa" font-size="12" text-anchor="middle">Body stops, but loose clothing (cape) continues past the stop</text>
+             </svg>`,
+      text: "<strong>Follow Through and Overlapping Action:</strong> This captures the physics of inertia. When a character stops running, loose elements like clothing, hair, or tails keep moving before settling (Follow Through), and body parts move at staggered rates (Overlapping Action)."
+    },
+    ease: {
+      html: `<svg width="400" height="225" viewBox="0 0 400 225">
+               <!-- Motion track line -->
+               <line x1="50" y1="110" x2="350" y2="110" stroke="#444" stroke-width="2" stroke-dasharray="5,5"/>
+               <!-- Moving object with smooth acceleration/deceleration -->
+               <g class="animating-ease">
+                 <circle cx="200" cy="110" r="25" fill="#4caf50"/>
+                 <circle cx="192" cy="105" r="4" fill="#fff"/>
+                 <circle cx="208" cy="105" r="4" fill="#fff"/>
+               </g>
+               <text x="200" y="180" fill="#aaa" font-size="12" text-anchor="middle">Crowded frames at start/end (Slow In/Out), spaced out in the middle</text>
+             </svg>`,
+      text: "<strong>Slow In and Slow Out (Ease In / Ease Out):</strong> The control of spacing between individual frames. Real-world physics require objects to accelerate and decelerate gradually. Adding more drawings near the beginning and end of an action creates natural momentum."
+    }
+  };
+
+  function setPrinciple(type) {
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    
+    demoObject.innerHTML = contentData[type].html;
+    descBox.innerHTML = contentData[type].text;
+  }
+
+  // Initialize on load
+  setPrinciple('staging');
+</script>
